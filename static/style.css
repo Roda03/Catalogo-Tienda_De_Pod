@@ -1,0 +1,134 @@
+/* Estilos personalizados para D'CLOUD VAPESHOP */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Estilos para el logo D'CLOUD VAPESHOP */
+.logo-container {
+    text-align: center;
+    line-height: 1;
+}
+
+.logo-main {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffffff;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.logo-sub {
+    font-size: 0.9rem;
+    color: #20c997;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+.navbar-brand {
+    padding: 0;
+}
+
+.navbar-brand:hover .logo-main {
+    color: #20c997;
+    transition: color 0.3s ease;
+}
+
+.product-image {
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.card:hover .product-image {
+    transform: scale(1.05);
+}
+
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: none;
+    border-radius: 15px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.alert-warning {
+    border-left: 5px solid #ffc107;
+    border-radius: 10px;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+.table th {
+    border-top: none;
+}
+
+/* Estilos para el header principal */
+.page-header {
+    background: linear-gradient(135deg, #343a40, #495057);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    border-radius: 0 0 20px 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .logo-main {
+        font-size: 1.5rem;
+    }
+    
+    .logo-sub {
+        font-size: 0.7rem;
+    }
+}
+
+/* Efectos especiales para el logo */
+@keyframes glow {
+    0% { text-shadow: 0 0 5px #fff, 0 0 10px #20c997; }
+    50% { text-shadow: 0 0 10px #fff, 0 0 20px #20c997; }
+    100% { text-shadow: 0 0 5px #fff, 0 0 10px #20c997; }
+}
+
+.logo-main {
+    animation: glow 3s ease-in-out infinite;
+}

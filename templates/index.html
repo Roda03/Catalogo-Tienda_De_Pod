@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="alert alert-warning text-center" role="alert">
+    ⚠️ <strong>ADVERTENCIA:</strong> Este producto contiene nicotina. La nicotina es una sustancia adictiva. No recomendado para menores de edad, mujeres embarazadas o en período de lactancia, personas con condiciones cardíacas, presión arterial alta, diabetes o asma.
+</div>
+
+<h1 class="text-center mb-4">Catálogo de Pods Electrónicos</h1>
+
+<div class="row">
+    {% for producto in productos %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="position-relative">
+                <img src="{{ url_for('static', filename='images/' + producto.imagen) }}" 
+                     class="card-img-top product-image" 
+                     alt="{{ producto.nombre }}"
+                     onerror="this.src='https://via.placeholder.com/300x200?text=Imagen+No+Disponible'">
+                <div class="position-absolute top-0 end-0 m-2">
+                    <span class="badge {% if producto.stock > 2 %}bg-success{% elif producto.stock > 0 %}bg-warning{% else %}bg-danger{% endif %}">
+                        {% if producto.stock > 2 %}✅ Disponible
+                        {% elif producto.stock > 0 %}🟡 {{ producto.stock }} unidades
+                        {% else %}❌ Agotado
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{ producto.nombre }}</h5>
+                <p class="card-text text-muted">{{ producto.sabor }}</p>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <p class="card-text fw-bold text-primary fs-4 mb-0">{{ "%.0f"|format(producto.precio) }} Gs</p>
+                    <small class="text-muted">Stock: {{ producto.stock }}</small>
+                </div>
+                <div class="mt-auto">
+                    <a href="https://wa.me/1234567890?text=Hola,%20me%20interesa%20el%20pod%20{{ producto.nombre|urlencode }}%20({{ producto.sabor|urlencode }})%20que%20vi%20en%20su%20catálogo.%20Stock:%20{{ producto.stock }}%20unidades" 
+                       class="btn {% if producto.stock > 0 %}btn-success{% else %}btn-secondary disabled{% endif %} w-100" 
+                       target="_blank"
+                       {% if producto.stock == 0 %}aria-disabled="true"{% endif %}>
+                       {% if producto.stock > 0 %}📱 Consultar por WhatsApp{% else %}❌ Agotado{% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">¿Te gustaría sugerir un nuevo sabor?</h4>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('sugerir') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="sabor" class="form-label">Describe el sabor que te gustaría probar:</label>
+                        <textarea class="form-control" id="sabor" name="sabor" rows="3" 
+                                  placeholder="Ej: Chocolate con menta, Piña colada, etc..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar Sugerencia</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

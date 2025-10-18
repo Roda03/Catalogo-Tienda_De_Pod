@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Denegado - D'CLOUD VAPESHOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            color: white;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .denied-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .logo-container {
+            text-align: center;
+            line-height: 1;
+            margin-bottom: 2rem;
+        }
+        .logo-main {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffffff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .logo-sub {
+            font-size: 1rem;
+            color: #20c997;
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+        .denied-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="denied-container">
+        <div class="logo-container">
+            <div class="logo-main">D'CLOUD</div>
+            <div class="logo-sub">VAPESHOP</div>
+        </div>
+        
+        <div class="denied-icon">🚫</div>
+        
+        <h2 class="mb-4">Acceso Denegado</h2>
+        
+        <div class="alert alert-danger mb-4">
+            <strong>No puedes acceder a este contenido.</strong><br>
+            Los productos con nicotina están restringidos a mayores de 18 años.
+        </div>
+        
+        <p class="mb-4">Gracias por tu honestidad. La venta de productos con nicotina a menores de edad está prohibida por ley.</p>
+        
+        <a href="https://www.google.com" class="btn btn-primary">
+            🏠 Salir del sitio
+        </a>
+        
+        <div class="legal-text small text-muted mt-4">
+            Si crees que esto es un error, cierra y vuelve a abrir el navegador.
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "nombre": "Miami Mint",
+    "sabor": "Menta refrescante de Miami",
+    "precio": 70000,
+    "imagen": "miami-mint.jpg",
+    "stock": 3
+  },
+  {
+    "id": 2,
+    "nombre": "Monster Drink",
+    "sabor": "Energética y revitalizante",
+    "precio": 70000,
+    "imagen": "monster-drink.jpg",
+    "stock": 2
+  },
+  {
+    "id": 3,
+    "nombre": "Menthol",
+    "sabor": "Mentol clásico y refrescante",
+    "precio": 70000,
+    "imagen": "menthol.jpg",
+    "stock": 2
+  },
+  {
+    "id": 4,
+    "nombre": "Blue Dragon Razz",
+    "sabor": "Dragon azul con frambuesa",
+    "precio": 70000,
+    "imagen": "blue-dragon-razz.jpg",
+    "stock": 2
+  },
+  {
+    "id": 5,
+    "nombre": "Dragon Fruit",
+    "sabor": "Fruta del dragón tropical",
+    "precio": 70000,
+    "imagen": "dragon-fruit.jpg",
+    "stock": 2
+  },
+  {
+    "id": 6,
+    "nombre": "Blackberry Ice",
+    "sabor": "Mora negra con hielo",
+    "precio": 70000,
+    "imagen": "blackberry-ice.jpg",
+    "stock": 1
+  },
+  {
+    "id": 7,
+    "nombre": "Blueberry Mint",
+    "sabor": "Arándano con menta",
+    "precio": 70000,
+    "imagen": "blueberry-mint.jpg",
+    "stock": 2
+  },
+  {
+    "id": 8,
+    "nombre": "Love 66",
+    "sabor": "Mezcla especial Love 66",
+    "precio": 70000,
+    "imagen": "love-66.jpg",
+    "stock": 2
+  },
+  {
+    "id": 9,
+    "nombre": "Mint Waterberry",
+    "sabor": "Menta con frutos del bosque acuosos",
+    "precio": 70000,
+    "imagen": "mint-waterberry.jpg",
+    "stock": 2
+  },
+  {
+    "id": 10,
+    "nombre": "Blueberry Strawberry",
+    "sabor": "Mezcla de arándano y fresa",
+    "precio": 70000,
+    "imagen": "blueberry-strawberry.jpg",
+    "stock": 1
+  },
+  {
+    "id": 11,
+    "nombre": "Pink Lemonade",
+    "sabor": "Limonada rosa refrescante",
+    "precio": 70000,
+    "imagen": "pink-lemonade.jpg",
+    "stock": 1
+  }
+]
