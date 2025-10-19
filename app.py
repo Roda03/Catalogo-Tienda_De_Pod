@@ -45,17 +45,17 @@ def init_db():
     
     if count == 0:
         productos_iniciales = [
-            ("Miami Mint", "Menta refrescante de Miami", 70000, "miami-mint.jpg", 3),
-            ("Monster Drink", "Energética y revitalizante", 70000, "monster-drink.jpg", 2),
-            ("Menthol", "Mentol clásico y refrescante", 70000, "menthol.jpg", 2),
-            ("Blue Dragon Razz", "Dragon azul con frambuesa", 70000, "blue-dragon-razz.jpg", 2),
-            ("Dragon Fruit", "Fruta del dragón tropical", 70000, "dragon-fruit.jpg", 2),
-            ("Blackberry Ice", "Mora negra con hielo", 70000, "blackberry-ice.jpg", 1),
-            ("Blueberry Mint", "Arándano con menta", 70000, "blueberry-mint.jpg", 2),
-            ("Love 66", "Mezcla especial Love 66", 70000, "love-66.jpg", 2),
-            ("Mint Waterberry", "Menta con frutos del bosque acuosos", 70000, "mint-waterberry.jpg", 2),
-            ("Blueberry Strawberry", "Mezcla de arándano y fresa", 70000, "blueberry-strawberry.jpg", 1),
-            ("Pink Lemonade", "Limonada rosa refrescante", 70000, "pink-lemonade.jpg", 1)
+            ("Miami Mint", "Menta fresca de perfil limpio y equilibrado, con un sutil dulzor", 70000, "miami-mint.jpg", 3),
+            ("Monster Drink", "Monster Drink trae una ola cítrica tropical bien fría, como lata recién abierta en verano. Arranca chispeante, sigue con dulzor justo y remata con un toque ácido que deja el paladar limpio. Enérgico, sabroso, cero empalagoso.", 70000, "monster-drink.jpg", 2),
+            ("Menthol", "Menthol trae un frío directo y limpio: menta nítida que entra fresca, sube el ice y deja el paladar despierto. Final seco y súper refrescante. Reset al toque, cero dulzón.", 70000, "menthol.jpg", 2),
+            ("Blue Dragon Razz", "Blue Dragon Razz mezcla frambuesa azul con fruta del dragón jugosa, arranca chispeante, lleva el acidito justo y termina con un ice que limpia el paladar. Dulzor moderado, vibra tropical, cero empalagoso.", 70000, "blue-dragon-razz.jpg", 2),
+            ("Dragon Fruit", "Dragon Fruit trae fruta del dragón bien jugosa: arranca suave y tropical, con toques tipo pera/kiwi, un acidito leve al medio y cierre fresco que limpia el paladar. Ligero, sabroso, cero empalagoso.", 70000, "dragon-fruit.jpg", 2),
+            ("Blackberry Ice", "Notas de mora intensa sobre una base fresca tipo “ice”. Avanza con buen cuerpo frutal y termina seco y cristalino. Ideal para quienes buscan claridad y equilibrio.", 70000, "blackberry-ice.jpg", 1),
+            ("Blueberry Mint", "Arándano maduro con menta fresca en base helada; entrada limpia, cuerpo jugoso y final seco, muy refrescante.", 70000, "blueberry-mint.jpg", 2),
+            ("Love 66", "Maracuyá y melón con toque de menta sobre base helada; entra brillante, sigue jugoso y termina limpio. Tropical, fresco, sin empalagar.", 70000, "love-66.jpg", 2),
+            ("Mint Waterberry", "Sandía y frutos rojos con guiño mentolado: arranca brillante, se vuelve jugoso y se despide ligero.", 70000, "mint-waterberry.jpg", 2),
+            ("Blueberry Strawberry", "Arándano maduro con frutilla jugosa; entrada suave, centro frutal y despedida seca, sin empalagar.", 70000, "blueberry-strawberry.jpg", 1),
+            ("Pink Lemonade", "Limón al frente, frutilla de soporte; vibra veraniega, aftertaste claro y ordenado.", 70000, "pink-lemonade.jpg", 1)
         ]
         
         c.executemany('''INSERT INTO productos (nombre, sabor, precio, imagen, stock) 
