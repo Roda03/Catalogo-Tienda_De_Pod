@@ -66,7 +66,13 @@
                             <tr>
                                 <td>{{ sugerencia[0] }}</td>
                                 <td>{{ sugerencia[1] }}</td>
-                                <td>{{ sugerencia[2].strftime('%d/%m/%Y') if sugerencia[2] }}</td>
+                                <td>
+                                    {% if sugerencia[2] %}
+                                        {{ sugerencia[2] }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% else %}
                             <tr>
