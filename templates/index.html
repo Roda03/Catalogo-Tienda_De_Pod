@@ -33,11 +33,11 @@
                     <small class="text-muted">Stock: {{ producto.stock }}</small>
                 </div>
                 <div class="mt-auto">
-                    <a href="https://wa.me/1234567890?text=Hola,%20me%20interesa%20el%20pod%20{{ producto.nombre|urlencode }}%20({{ producto.sabor|urlencode }})%20que%20vi%20en%20su%20catálogo.%20Stock:%20{{ producto.stock }}%20unidades" 
-                       class="btn {% if producto.stock > 0 %}btn-success{% else %}btn-secondary disabled{% endif %} w-100" 
-                       target="_blank"
-                       {% if producto.stock == 0 %}aria-disabled="true"{% endif %}>
-                       {% if producto.stock > 0 %}📱 Consultar por WhatsApp{% else %}❌ Agotado{% endif %}
+                    <a href="https://wa.me/595975539793?text=Hola,%20me%20interesa%20el%20pod%20{{ producto.nombre|urlencode }}" 
+                    class="btn {% if producto.stock > 0 %}btn-success{% else %}btn-secondary disabled{% endif %} w-100" 
+                    target="_blank"
+                    {% if producto.stock == 0 %}aria-disabled="true"{% endif %}>
+                    {% if producto.stock > 0 %}📱 Consultar por WhatsApp{% else %}❌ Agotado{% endif %}
                     </a>
                 </div>
             </div>
