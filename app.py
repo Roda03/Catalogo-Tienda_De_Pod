@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 import os
-import psycopg2
+import sqlite3
 from psycopg2.extras import RealDictCursor
 
 app = Flask(__name__)
@@ -11,21 +11,11 @@ ADMIN_PASSWORD = "admin123"
 
 # Configuración de PostgreSQL
 def get_db_connection():
-    database_url = os.environ.get('DATABASE_URL')
-    
-    if database_url:
-        # Para Render
-        conn = psycopg2.connect(database_url, sslmode='require')
+    if os.environ.get('DATABASE_URL'):
+        # Temporalmente usa SQLite
+        conn = sqlite3.connect('temp.db')
     else:
-        # Para desarrollo local
-        conn = psycopg2.connect(
-            host='localhost',
-            database='dcloud_vapeshop',
-            user='postgres',
-            password='tu_password',
-            port='5432'
-        )
-    
+        conn = sqlite3.connect('temp.db')
     return conn
 
 # Verificar si el usuario es mayor de edad
