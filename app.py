@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
-import os
 import sqlite3
-from psycopg2.extras import RealDictCursor
+import os
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'dcloud_secret_key_2024'
@@ -9,13 +9,10 @@ app.secret_key = 'dcloud_secret_key_2024'
 # Configuración
 ADMIN_PASSWORD = "admin123"
 
-# Configuración de PostgreSQL
+# SQLite temporal
 def get_db_connection():
-    if os.environ.get('DATABASE_URL'):
-        # Temporalmente usa SQLite
-        conn = sqlite3.connect('temp.db')
-    else:
-        conn = sqlite3.connect('temp.db')
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
     return conn
 
 # Verificar si el usuario es mayor de edad
@@ -29,13 +26,13 @@ def init_db():
     
     # Crear tabla de sugerencias
     c.execute('''CREATE TABLE IF NOT EXISTS sugerencias_sabores
-                 (id SERIAL PRIMARY KEY,
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   sabor TEXT NOT NULL,
                   fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     
     # Crear tabla de productos
     c.execute('''CREATE TABLE IF NOT EXISTS productos
-                 (id SERIAL PRIMARY KEY,
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   nombre TEXT NOT NULL,
                   sabor TEXT NOT NULL,
                   precio INTEGER NOT NULL,
@@ -62,43 +59,68 @@ def init_db():
         ]
         
         c.executemany('''INSERT INTO productos (nombre, sabor, precio, imagen, stock) 
-                         VALUES (%s, %s, %s, %s, %s)''', productos_iniciales)
+                         VALUES (?, ?, ?, ?, ?)''', productos_iniciales)
     
     conn.commit()
     conn.close()
+    print("✅ Base de datos SQLite inicializada correctamente")
 
-# Cargar productos desde PostgreSQL
+# Cargar productos desde SQLite
 def cargar_productos():
-    conn = get_db_connection()
-    c = conn.cursor(cursor_factory=RealDictCursor)
-    c.execute("SELECT * FROM productos ORDER BY id")
-    productos = c.fetchall()
-    conn.close()
-    return [dict(producto) for producto in productos]
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute("SELECT * FROM productos ORDER BY id")
+        productos = c.fetchall()
+        conn.close()
+        
+        # Convertir a lista de diccionarios
+        productos_list = []
+        for producto in productos:
+            productos_list.append(dict(producto))
+        return productos_list
+    except Exception as e:
+        print(f"Error cargando productos: {e}")
+        return []
 
 # Guardar sugerencia de sabor
 def guardar_sugerencia_sabor(sabor):
-    conn = get_db_connection()
-    c = conn.cursor()
-    c.execute("INSERT INTO sugerencias_sabores (sabor) VALUES (%s)", (sabor,))
-    conn.commit()
-    conn.close()
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute("INSERT INTO sugerencias_sabores (sabor) VALUES (?)", (sabor,))
+        conn.commit()
+        conn.close()
+        print(f"✅ Sugerencia guardada: {sabor}")
+        return True
+    except Exception as e:
+        print(f"❌ Error guardando sugerencia: {e}")
+        return False
 
 # Obtener sugerencias
 def obtener_sugerencias_sabores():
-    conn = get_db_connection()
-    c = conn.cursor()
-    c.execute("SELECT id, sabor, fecha_creacion FROM sugerencias_sabores ORDER BY id DESC")
-    sugerencias = c.fetchall()
-    conn.close()
-    return sugerencias
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute("SELECT id, sabor, fecha_creacion FROM sugerencias_sabores ORDER BY id DESC")
+        sugerencias = c.fetchall()
+        conn.close()
+        
+        # Convertir a lista de tuplas
+        sugerencias_list = []
+        for sugerencia in sugerencias:
+            sugerencias_list.append(tuple(sugerencia))
+        return sugerencias_list
+    except Exception as e:
+        print(f"Error obteniendo sugerencias: {e}")
+        return []
 
 # Actualizar stock
 def actualizar_stock(producto_id, nuevo_stock):
     try:
         conn = get_db_connection()
         c = conn.cursor()
-        c.execute("UPDATE productos SET stock = %s WHERE id = %s", (nuevo_stock, producto_id))
+        c.execute("UPDATE productos SET stock = ? WHERE id = ?", (nuevo_stock, producto_id))
         conn.commit()
         conn.close()
         return True
@@ -106,30 +128,59 @@ def actualizar_stock(producto_id, nuevo_stock):
         print(f"Error actualizando stock: {e}")
         return False
 
-# Ruta para verificación de edad
-@app.route('/verificar_edad', methods=['POST'])
-def verificar_edad():
-    opcion = request.form.get('edad')
-    if opcion == 'si':
-        session['mayor_de_edad'] = True
-        session.permanent = True
+# Ruta para diagnóstico de base de datos
+@app.route('/debug-db')
+def debug_db():
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        
+        # Verificar tablas
+        c.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        tablas = c.fetchall()
+        
+        # Verificar sugerencias
+        c.execute("SELECT COUNT(*) FROM sugerencias_sabores")
+        count_sugerencias = c.fetchone()[0]
+        
+        # Verificar productos
+        c.execute("SELECT COUNT(*) FROM productos")
+        count_productos = c.fetchone()[0]
+        
+        conn.close()
+        
+        return f"""
+        <h1>Debug Base de Datos SQLite</h1>
+        <p><strong>Tablas existentes:</strong> {[tabla[0] for tabla in tablas]}</p>
+        <p><strong>Sugerencias en la tabla:</strong> {count_sugerencias}</p>
+        <p><strong>Productos en la tabla:</strong> {count_productos}</p>
+        <p style="color: green;">✅ Conexión SQLite exitosa</p>
+        """
+    except Exception as e:
+        return f"<h1>Error: {str(e)}</h1>"
+
+# Ruta principal - verificación de edad
+@app.route('/', methods=['GET', 'POST'])
+def edad_gate():
+    if request.method == 'POST':
+        opcion = request.form.get('edad')
+        if opcion == 'si':
+            session['mayor_de_edad'] = True
+            session.permanent = True
+            return redirect(url_for('index'))
+        else:
+            return redirect(url_for('acceso_denegado'))
+    
+    if es_mayor_de_edad():
         return redirect(url_for('index'))
-    else:
-        return redirect(url_for('acceso_denegado'))
+    return render_template('edad_gate.html')
 
 # Página de acceso denegado
 @app.route('/acceso_denegado')
 def acceso_denegado():
     return render_template('acceso_denegado.html')
 
-# Página de verificación de edad
-@app.route('/')
-def edad_gate():
-    if es_mayor_de_edad():
-        return redirect(url_for('index'))
-    return render_template('edad_gate.html')
-
-# Catálogo principal (solo accesible si es mayor de edad)
+# Catálogo principal
 @app.route('/catalogo')
 def index():
     if not es_mayor_de_edad():
@@ -138,6 +189,7 @@ def index():
     productos = cargar_productos()
     return render_template('index.html', productos=productos)
 
+# Ruta para sugerir sabores
 @app.route('/sugerir', methods=['POST'])
 def sugerir():
     if not es_mayor_de_edad():
@@ -145,9 +197,16 @@ def sugerir():
     
     sabor = request.form.get('sabor', '').strip()
     if sabor:
-        guardar_sugerencia_sabor(sabor)
+        if guardar_sugerencia_sabor(sabor):
+            # Éxito
+            return redirect(url_for('index'))
+        else:
+            # Error pero redirige igual para no interrumpir la experiencia
+            print("Error al guardar sugerencia, pero continuando...")
+            return redirect(url_for('index'))
     return redirect(url_for('index'))
 
+# Panel de administración
 @app.route('/admin')
 def admin():
     password = request.args.get('pass', '')
@@ -159,6 +218,7 @@ def admin():
     productos = cargar_productos()
     return render_template('admin.html', sugerencias=sugerencias, productos=productos)
 
+# Actualizar stock
 @app.route('/actualizar_stock', methods=['POST'])
 def actualizar_stock_route():
     password = request.args.get('pass', '')
@@ -199,7 +259,7 @@ def agregar_producto():
         conn = get_db_connection()
         c = conn.cursor()
         c.execute('''INSERT INTO productos (nombre, sabor, precio, imagen, stock) 
-                     VALUES (%s, %s, %s, %s, %s)''', 
+                     VALUES (?, ?, ?, ?, ?)''', 
                  (nombre, sabor, precio, imagen, stock))
         conn.commit()
         conn.close()
@@ -214,6 +274,9 @@ def salir():
     session.pop('mayor_de_edad', None)
     return redirect(url_for('edad_gate'))
 
-if __name__ == '__main__':
+# Inicializar la base de datos al inicio
+with app.app_context():
     init_db()
+
+if __name__ == '__main__':
     app.run(debug=True)
