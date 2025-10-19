@@ -58,6 +58,7 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Sabor Sugerido</th>
+                                <th>Fecha</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -65,10 +66,11 @@
                             <tr>
                                 <td>{{ sugerencia[0] }}</td>
                                 <td>{{ sugerencia[1] }}</td>
+                                <td>{{ sugerencia[2].strftime('%d/%m/%Y') if sugerencia[2] }}</td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="2" class="text-center">No hay sugerencias</td>
+                                <td colspan="3" class="text-center">No hay sugerencias</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -79,7 +81,106 @@
     </div>
 </div>
 
+<!-- NUEVA SECCIÓN: Agregar Producto -->
+<div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">➕ Agregar Nuevo Producto</h5>
+            </div>
+            <div class="card-body">
+                <form id="formAgregarProducto" action="{{ url_for('agregar_producto', pass=request.args.get('pass')) }}" method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre del Producto</label>
+                            <input type="text" name="nombre" class="form-control" placeholder="Ej: Tropical Mango" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Descripción del Sabor</label>
+                            <input type="text" name="sabor" class="form-control" placeholder="Ej: Mango tropical refrescante" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Precio (Gs)</label>
+                            <input type="number" name="precio" class="form-control" value="70000" min="1" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Nombre de Imagen</label>
+                            <input type="text" name="imagen" class="form-control" placeholder="Ej: tropical-mango.jpg" required>
+                            <small class="text-muted">Recuerda subir la imagen a /static/images/</small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Stock Inicial</label>
+                            <input type="number" name="stock" class="form-control" value="1" min="0" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <span id="btnText">Agregar Producto</span>
+                        <div id="spinner" class="spinner-border spinner-border-sm d-none" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </button>
+                </form>
+                <div id="mensajeResultado" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="text-center mt-4">
     <a href="{{ url_for('index') }}" class="btn btn-secondary">Volver al Catálogo</a>
 </div>
+
+<script>
+document.getElementById('formAgregarProducto').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const btn = this.querySelector('button[type="submit"]');
+    const btnText = document.getElementById('btnText');
+    const spinner = document.getElementById('spinner');
+    const mensaje = document.getElementById('mensajeResultado');
+    
+    // Mostrar spinner
+    btn.disabled = true;
+    btnText.textContent = 'Agregando...';
+    spinner.classList.remove('d-none');
+    mensaje.innerHTML = '';
+    
+    // Enviar formulario
+    fetch(this.action, {
+        method: 'POST',
+        body: new FormData(this)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mensaje.innerHTML = '<div class="alert alert-success">✅ ' + data.message + '</div>';
+            this.reset();
+            // Recargar la página después de 2 segundos para ver los cambios
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            mensaje.innerHTML = '<div class="alert alert-danger">❌ ' + data.error + '</div>';
+        }
+    })
+    .catch(error => {
+        mensaje.innerHTML = '<div class="alert alert-danger">❌ Error de conexión</div>';
+    })
+    .finally(() => {
+        // Ocultar spinner
+        btn.disabled = false;
+        btnText.textContent = 'Agregar Producto';
+        spinner.classList.add('d-none');
+    });
+});
+</script>
+
+<style>
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+</style>
 {% endblock %}
