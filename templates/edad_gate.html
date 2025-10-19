@@ -78,7 +78,7 @@
         <p class="mb-4">Para acceder a nuestro catálogo, debes confirmar que eres mayor de 18 años.</p>
         
         <div class="mb-4">
-            <form action="{{ url_for('verificar_edad') }}" method="POST">
+            <form action="{{ url_for('edad_gate') }}" method="POST">
                 <button type="submit" name="edad" value="si" class="btn btn-success btn-age">
                     ✅ Sí, soy mayor de 18 años
                 </button>
