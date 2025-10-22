@@ -17,8 +17,9 @@
                         <thead>
                             <tr>
                                 <th>Producto</th>
-                                <th>Stock Actual</th>
-                                <th>Acción</th>
+                                <th>Stock</th>
+                                <th>Categoría</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -31,11 +32,24 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <form action="{{ url_for('actualizar_stock_route', pass=request.args.get('pass')) }}" method="POST" class="d-flex">
-                                        <input type="hidden" name="producto_id" value="{{ producto.id }}">
-                                        <input type="number" name="nuevo_stock" value="{{ producto.stock }}" min="0" class="form-control form-control-sm" style="width: 80px;">
-                                        <button type="submit" class="btn btn-sm btn-success ms-2">✓</button>
-                                    </form>
+                                    <span class="badge 
+                                        {% if producto.categoria == 'promo' %}bg-warning
+                                        {% elif producto.categoria == 'descuento' %}bg-success
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ producto.categoria|upper }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <form action="{{ url_for('actualizar_stock_route', pass=request.args.get('pass')) }}" method="POST" class="d-flex me-2">
+                                            <input type="hidden" name="producto_id" value="{{ producto.id }}">
+                                            <input type="number" name="nuevo_stock" value="{{ producto.stock }}" min="0" class="form-control form-control-sm" style="width: 80px;">
+                                            <button type="submit" class="btn btn-sm btn-success ms-1">✓</button>
+                                        </form>
+                                        <button class="btn btn-sm btn-danger btn-eliminar" data-producto-id="{{ producto.id }}" data-producto-nombre="{{ producto.nombre }}">
+                                            🗑️
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -121,6 +135,17 @@
                             <input type="number" name="stock" class="form-control" value="1" min="0" required>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Categoría</label>
+                            <select name="categoria" class="form-select" required>
+                                <option value="normal">Normal</option>
+                                <option value="promo">Promoción</option>
+                                <option value="descuento">Descuento</option>
+                            </select>
+                            <small class="text-muted">Los productos en "Promoción" y "Descuento" aparecerán al inicio con efectos especiales</small>
+                        </div>
+                    </div>
                     <button type="submit" class="btn btn-success w-100">
                         <span id="btnText">Agregar Producto</span>
                         <div id="spinner" class="spinner-border spinner-border-sm d-none" role="status">
@@ -138,7 +163,28 @@
     <a href="{{ url_for('index') }}" class="btn btn-secondary">Volver al Catálogo</a>
 </div>
 
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="modalConfirmarEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que quieres eliminar el producto: <strong id="nombreProductoEliminar"></strong>?</p>
+                <p class="text-danger"><strong>⚠️ Esta acción no se puede deshacer.</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">Sí, Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+// Script para agregar producto (existente)
 document.getElementById('formAgregarProducto').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -181,12 +227,79 @@ document.getElementById('formAgregarProducto').addEventListener('submit', functi
         spinner.classList.add('d-none');
     });
 });
+
+// Script para eliminar productos
+document.addEventListener('DOMContentLoaded', function() {
+    let productoAEliminar = null;
+    const modal = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));
+    
+    // Evento para botones de eliminar
+    document.querySelectorAll('.btn-eliminar').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productoId = this.getAttribute('data-producto-id');
+            const productoNombre = this.getAttribute('data-producto-nombre');
+            
+            productoAEliminar = productoId;
+            document.getElementById('nombreProductoEliminar').textContent = productoNombre;
+            modal.show();
+        });
+    });
+    
+    // Evento para confirmar eliminación
+    document.getElementById('btnConfirmarEliminar').addEventListener('click', function() {
+        if (!productoAEliminar) return;
+        
+        const formData = new FormData();
+        formData.append('producto_id', productoAEliminar);
+        
+        fetch(`{{ url_for('eliminar_producto', pass=request.args.get('pass')) }}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mostrar mensaje de éxito y recargar
+                const mensaje = document.createElement('div');
+                mensaje.className = 'alert alert-success alert-dismissible fade show';
+                mensaje.innerHTML = `
+                    ✅ ${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.querySelector('.container').insertBefore(mensaje, document.querySelector('.container').firstChild);
+                
+                // Recargar la página después de 1.5 segundos
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error de conexión: ' + error);
+        })
+        .finally(() => {
+            modal.hide();
+            productoAEliminar = null;
+        });
+    });
+});
 </script>
 
 <style>
 .spinner-border-sm {
     width: 1rem;
     height: 1rem;
+}
+
+.btn-eliminar {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.d-flex.gap-1 {
+    gap: 0.25rem;
 }
 </style>
 {% endblock %}

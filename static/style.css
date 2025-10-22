@@ -99,6 +99,93 @@ body {
     border-radius: 0 0 20px 20px;
 }
 
+/* Estilos para productos en promoción */
+.promo-card {
+    border: 2px solid #ffc107;
+    animation: pulse-gold 2s infinite;
+}
+
+.promo-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(135deg, #ffc107, #ff8c00);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    z-index: 10;
+    animation: shine 3s infinite;
+}
+
+/* Estilos para productos en descuento */
+.discount-card {
+    border: 2px solid #28a745;
+    animation: pulse-green 2s infinite;
+}
+
+.discount-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    z-index: 10;
+    animation: shine 3s infinite;
+}
+
+/* Estilos para títulos de sección - Versión compatible */
+.section-title-promo {
+    color: #ff8c00;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(255, 140, 0, 0.3);
+}
+
+.section-title-discount {
+    color: #28a745;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+/* Animaciones */
+@keyframes pulse-gold {
+    0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+}
+
+@keyframes pulse-green {
+    0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+}
+
+@keyframes shine {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #ffc107, #ff8c00);
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+    color: white;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .container {
@@ -119,6 +206,11 @@ body {
     
     .logo-sub {
         font-size: 0.7rem;
+    }
+    
+    .promo-badge, .discount-badge {
+        font-size: 0.7rem;
+        padding: 3px 10px;
     }
 }
 

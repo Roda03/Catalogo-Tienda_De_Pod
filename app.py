@@ -37,7 +37,8 @@ def init_db():
                   sabor TEXT NOT NULL,
                   precio INTEGER NOT NULL,
                   imagen TEXT NOT NULL,
-                  stock INTEGER DEFAULT 1)''')
+                  stock INTEGER DEFAULT 1,
+                  categoria TEXT DEFAULT 'normal')''')
     
     # Verificar si hay productos, si no, insertar los predeterminados
     c.execute("SELECT COUNT(*) FROM productos")
@@ -45,21 +46,21 @@ def init_db():
     
     if count == 0:
         productos_iniciales = [
-            ("Miami Mint", "Menta fresca de perfil limpio y equilibrado, con un sutil dulzor", 70000, "miami-mint.jpg", 3),
-            ("Monster Drink", "Monster Drink trae una ola cítrica tropical bien fría, como lata recién abierta en verano. Arranca chispeante, sigue con dulzor justo y remata con un toque ácido que deja el paladar limpio. Enérgico, sabroso, cero empalagoso.", 70000, "monster-drink.jpg", 2),
-            ("Menthol", "Menthol trae un frío directo y limpio: menta nítida que entra fresca, sube el ice y deja el paladar despierto. Final seco y súper refrescante. Reset al toque, cero dulzón.", 70000, "menthol.jpg", 2),
-            ("Blue Dragon Razz", "Blue Dragon Razz mezcla frambuesa azul con fruta del dragón jugosa, arranca chispeante, lleva el acidito justo y termina con un ice que limpia el paladar. Dulzor moderado, vibra tropical, cero empalagoso.", 70000, "blue-dragon-razz.jpg", 2),
-            ("Dragon Fruit", "Dragon Fruit trae fruta del dragón bien jugosa: arranca suave y tropical, con toques tipo pera/kiwi, un acidito leve al medio y cierre fresco que limpia el paladar. Ligero, sabroso, cero empalagoso.", 70000, "dragon-fruit.jpg", 2),
-            ("Blackberry Ice", "Notas de mora intensa sobre una base fresca tipo “ice”. Avanza con buen cuerpo frutal y termina seco y cristalino. Ideal para quienes buscan claridad y equilibrio.", 70000, "blackberry-ice.jpg", 1),
-            ("Blueberry Mint", "Arándano maduro con menta fresca en base helada; entrada limpia, cuerpo jugoso y final seco, muy refrescante.", 70000, "blueberry-mint.jpg", 2),
-            ("Love 66", "Maracuyá y melón con toque de menta sobre base helada; entra brillante, sigue jugoso y termina limpio. Tropical, fresco, sin empalagar.", 70000, "love-66.jpg", 2),
-            ("Mint Waterberry", "Sandía y frutos rojos con guiño mentolado: arranca brillante, se vuelve jugoso y se despide ligero.", 70000, "mint-waterberry.jpg", 2),
-            ("Blueberry Strawberry", "Arándano maduro con frutilla jugosa; entrada suave, centro frutal y despedida seca, sin empalagar.", 70000, "blueberry-strawberry.jpg", 1),
-            ("Pink Lemonade", "Limón al frente, frutilla de soporte; vibra veraniega, aftertaste claro y ordenado.", 70000, "pink-lemonade.jpg", 1)
+            ("Miami Mint", "Menta fresca de perfil limpio y equilibrado, con un sutil dulzor", 70000, "miami-mint.jpg", 3, "normal"),
+            ("Monster Drink", "Monster Drink trae una ola cítrica tropical bien fría, como lata recién abierta en verano. Arranca chispeante, sigue con dulzor justo y remata con un toque ácido que deja el paladar limpio. Enérgico, sabroso, cero empalagoso.", 70000, "monster-drink.jpg", 2, "normal"),
+            ("Menthol", "Menthol trae un frío directo y limpio: menta nítida que entra fresca, sube el ice y deja el paladar despierto. Final seco y súper refrescante. Reset al toque, cero dulzón.", 70000, "menthol.jpg", 2, "normal"),
+            ("Blue Dragon Razz", "Blue Dragon Razz mezcla frambuesa azul con fruta del dragón jugosa, arranca chispeante, lleva el acidito justo y termina con un ice que limpia el paladar. Dulzor moderado, vibra tropical, cero empalagoso.", 70000, "blue-dragon-razz.jpg", 2, "normal"),
+            ("Dragon Fruit", "Dragon Fruit trae fruta del dragón bien jugosa: arranca suave y tropical, con toques tipo pera/kiwi, un acidito leve al medio y cierre fresco que limpia el paladar. Ligero, sabroso, cero empalagoso.", 70000, "dragon-fruit.jpg", 2, "normal"),
+            ("Blackberry Ice", "Notas de mora intensa sobre una base fresca tipo \"ice\". Avanza con buen cuerpo frutal y termina seco y cristalino. Ideal para quienes buscan claridad y equilibrio.", 70000, "blackberry-ice.jpg", 1, "normal"),
+            ("Blueberry Mint", "Arándano maduro con menta fresca en base helada; entrada limpia, cuerpo jugoso y final seco, muy refrescante.", 70000, "blueberry-mint.jpg", 2, "normal"),
+            ("Love 66", "Maracuyá y melón con toque de menta sobre base helada; entra brillante, sigue jugoso y termina limpio. Tropical, fresco, sin empalagar.", 70000, "love-66.jpg", 2, "normal"),
+            ("Mint Waterberry", "Sandía y frutos rojos con guiño mentolado: arranca brillante, se vuelve jugoso y se despide ligero.", 70000, "mint-waterberry.jpg", 2, "normal"),
+            ("Blueberry Strawberry", "Arándano maduro con frutilla jugosa; entrada suave, centro frutal y despedida seca, sin empalagar.", 70000, "blueberry-strawberry.jpg", 1, "normal"),
+            ("Pink Lemonade", "Limón al frente, frutilla de soporte; vibra veraniega, aftertaste claro y ordenado.", 70000, "pink-lemonade.jpg", 1, "normal")
         ]
         
-        c.executemany('''INSERT INTO productos (nombre, sabor, precio, imagen, stock) 
-                         VALUES (?, ?, ?, ?, ?)''', productos_iniciales)
+        c.executemany('''INSERT INTO productos (nombre, sabor, precio, imagen, stock, categoria) 
+                         VALUES (?, ?, ?, ?, ?, ?)''', productos_iniciales)
     
     conn.commit()
     conn.close()
@@ -70,7 +71,13 @@ def cargar_productos():
     try:
         conn = get_db_connection()
         c = conn.cursor()
-        c.execute("SELECT * FROM productos ORDER BY id")
+        # Ordenar por categoría (promo y descuento primero) y luego por ID
+        c.execute('''SELECT * FROM productos 
+                     ORDER BY CASE 
+                         WHEN categoria = 'promo' THEN 1 
+                         WHEN categoria = 'descuento' THEN 2 
+                         ELSE 3 
+                     END, id''')
         productos = c.fetchall()
         conn.close()
         
@@ -255,16 +262,38 @@ def agregar_producto():
         precio = int(request.form.get('precio'))
         imagen = request.form.get('imagen')
         stock = int(request.form.get('stock', 1))
+        categoria = request.form.get('categoria', 'normal')
         
         conn = get_db_connection()
         c = conn.cursor()
-        c.execute('''INSERT INTO productos (nombre, sabor, precio, imagen, stock) 
-                     VALUES (?, ?, ?, ?, ?)''', 
-                 (nombre, sabor, precio, imagen, stock))
+        c.execute('''INSERT INTO productos (nombre, sabor, precio, imagen, stock, categoria) 
+                     VALUES (?, ?, ?, ?, ?, ?)''', 
+                 (nombre, sabor, precio, imagen, stock, categoria))
         conn.commit()
         conn.close()
         
         return jsonify({'success': True, 'message': 'Producto agregado correctamente'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+# Ruta para eliminar productos
+@app.route('/eliminar_producto', methods=['POST'])
+def eliminar_producto():
+    password = request.args.get('pass', '')
+    
+    if password != ADMIN_PASSWORD:
+        return jsonify({'error': 'Acceso denegado'}), 403
+    
+    try:
+        producto_id = request.form.get('producto_id')
+        
+        conn = get_db_connection()
+        c = conn.cursor()
+        c.execute("DELETE FROM productos WHERE id = ?", (producto_id,))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True, 'message': 'Producto eliminado correctamente'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
